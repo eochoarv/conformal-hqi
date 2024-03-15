@@ -27,8 +27,8 @@ git clone git@github.com:eochoarv/conformal-hqi.git
 
 ### ST DQR
 
-Please refer to [synthetic_example.ipynb](synthetic_example.ipynb) for basic usage. 
-Comparisons to competitive methods and can be found in [display_results.ipynb](display_results.ipynb).
+Please refer to [usage_example.ipynb](usage_example.ipynb) for basic usage. 
+Numerical experiments can be found in [numerical_experiments.ipynb](numerical_experiments.ipynb).
 
 ## Reproducible Research
 
