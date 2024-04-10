@@ -1,3 +1,6 @@
+# Working files #
+working*
+
 # Compiled source #
 ###################
 #*.com
@@ -25,7 +28,6 @@
 *.log
 *.sql
 *.sqlite
-*.csv
 *.pdf
 *.png
 *.jpg
@@ -45,3 +47,5 @@ Thumbs.db
 .ipynb_checkpoints*
 __pycache__/*
 216_2018_1156_MOESM4_ESM/
+flopp_flopp_e_pivot.csv
+test_library.csv
