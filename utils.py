@@ -9,15 +9,19 @@ Created on Tue Sep 26 09:54:19 2023
 import numpy as np
 import pandas as pd
 from sklearn.metrics import pairwise_distances
+from scipy.interpolate import interp1d
 from collections import defaultdict
 
-def conform_pref(cal_smx, val_smx, cal_labels, n, alpha, val_labels=None, cond=0):
+def conform_pred(cal_smx, val_smx, cal_labels, n, alpha, val_labels=None, cond=0):
     
     # 1: get conformal scores. n = calib_Y.shape[0]
     cal_scores = 1-cal_smx[np.arange(n),cal_labels]
     # 2: get adjusted quantile
     q_level = np.ceil((n+1)*(1-alpha))/n
-    qhat = np.quantile(cal_scores, q_level, interpolation='higher')
+    if alpha > 1 / (1+n):
+        qhat = np.quantile(cal_scores, q_level, interpolation='higher')
+    else:
+        qhat = 1
     n_list = [cal_scores[cal_labels==i].shape[0] for i in range(cal_smx.shape[1])]
     # 3: get prediction sets
     prediction_sets = val_smx >= (1-qhat) # 3: form prediction sets
@@ -25,7 +29,9 @@ def conform_pref(cal_smx, val_smx, cal_labels, n, alpha, val_labels=None, cond=0
     if cond == 1:
         # 4: if class conditional
         q_level_cond = [np.ceil((n+1)*(1-alpha))/n for n in n_list]
-        qhat_cond = np.array([np.quantile(cal_scores[cal_labels==i], q_level_cond[i], interpolation='higher') if i in np.unique(cal_labels) else 0 for i in range(cal_smx.shape[1])])
+        qhat_cond = np.array([1 if alpha < 1 / (1+n_list[i]) else 
+                              np.quantile(cal_scores[cal_labels==i], q_level_cond[i], interpolation='higher') 
+                              if i in np.unique(cal_labels) else 0 for i in range(cal_smx.shape[1])])
         prediction_sets_cond = (val_smx >= (1-qhat_cond))  
         if val_labels is None: 
             return prediction_sets_cond, qhat_cond
@@ -123,7 +129,7 @@ def experiment(smx, label_test, alphas, N, adaptive=0, cal_prop=0.8, initial_see
             
             n_sim = n_sim + 1
             n = cal_smx.shape[0]
-            (prediction_sets, empirical_coverage), qhat = conform_pref(cal_smx, val_smx, cal_labels, n, alpha, val_labels, cond=adaptive)
+            (prediction_sets, empirical_coverage), qhat = conform_pred(cal_smx, val_smx, cal_labels, n, alpha, val_labels, cond=adaptive)
             
             cov.append(empirical_coverage)
             set_size.append(prediction_sets.sum(1).mean())
@@ -161,3 +167,90 @@ def experiment(smx, label_test, alphas, N, adaptive=0, cal_prop=0.8, initial_see
     
     return res_df_hqi, (cov_by_label_hqi, cov_by_set_size_hqi, set_size_by_label_hqi)
     
+
+def interpol_spect(df_spectr, min_wl=0, max_wl=3500, n=1400, id_spetr='id', labeled=False):
+    
+    spectr_list = df_spectr[id_spetr].drop_duplicates()
+    df_spectr_min = df_spectr.groupby(id_spetr).min()
+    df_spectr_max = df_spectr.groupby(id_spetr).max()
+    all_wl = np.linspace(min_wl, max_wl, num=n, endpoint=True)
+
+    df_spectr_inter = pd.DataFrame()
+    
+
+    for fn in spectr_list:
+        df_spectr_fn = df_spectr.query(id_spetr + ' == @fn').reset_index(drop=True)
+        #df_lenght = df_spectr_fn.shape[0]    
+        min_wl = df_spectr_min.loc[fn, 'wavelength']
+        max_wl = df_spectr_max.loc[fn, 'wavelength']
+        
+        if labeled:
+            polymer_fn = df_spectr_fn['polymer'][0]
+            label_fn = df_spectr_fn['label'][0]
+        else:
+            polymer_fn = ''
+            label_fn = ''
+    
+        x = df_spectr_fn.loc[:, 'wavelength']
+        y = df_spectr_fn.loc[:, 'intensity']
+        f = interp1d(x, y)
+        #x_new = np.linspace(min_wl, max_wl, num=df_lenght, endpoint=True)
+        x_new = all_wl[np.logical_and(all_wl >= min_wl, all_wl <= max_wl)]
+        x_out = all_wl[np.logical_or(all_wl < min_wl, all_wl > max_wl)]
+        
+        df_spectr_inter = pd.concat([df_spectr_inter, 
+                                  pd.DataFrame({'wavelength':np.concatenate([x_new, x_out]), 
+                                                'intensity':np.concatenate([f(x_new), np.zeros(len(x_out))]) , 
+                                                'polymer':[polymer_fn] * n ,
+                                                'label':[label_fn] * n ,
+                                                id_spetr:[fn] * n }).sort_values('wavelength')])
+        
+    return df_spectr_inter.reset_index(drop=True)
+
+def hom_data(reference_library, calibration_set, test_set):    
+    # Interpolate calibration set and test set to make sure they are compatible with reference library wavenumbers
+    
+    wl_list = np.float64(reference_library.columns[3:])
+    calibration_set_l = calibration_set.melt(id_vars=['id', 'polymer', 'label'],
+                               var_name='wavelength',
+                               value_name='intensity')
+    calibration_set_l['wavelength'] = np.float64(calibration_set_l['wavelength'])
+
+    calibration_set_l = interpol_spect(calibration_set_l, 
+                                min_wl=wl_list.min(), 
+                                max_wl=wl_list.max(), n=wl_list.shape[0], id_spetr='id', labeled=True)
+
+    calibration_set = calibration_set_l.pivot(index=['id', 'polymer', 'label'], 
+                                columns='wavelength', 
+                                values='intensity').reset_index()
+
+    if 'polymer' in test_set.columns:
+        test_set_l = test_set.melt(id_vars=['id', 'polymer', 'label'],
+                                   var_name='wavelength',
+                                   value_name='intensity')
+
+        test_set_l['wavelength'] = np.float64(test_set_l['wavelength'])
+
+        test_set_l = interpol_spect(test_set_l, 
+                                    min_wl=wl_list.min(), 
+                                    max_wl=wl_list.max(), n=wl_list.shape[0], id_spetr='id',labeled=True)
+
+        test_set = test_set_l.pivot(index=['id', 'polymer', 'label'], 
+                                    columns='wavelength', 
+                                    values='intensity').reset_index()
+
+    else:
+        test_set_l = test_set.melt(id_vars=['id'],
+                                   var_name='wavelength',
+                                   value_name='intensity')
+
+        test_set_l['wavelength'] = np.float64(test_set_l['wavelength'])
+
+        test_set_l = interpol_spect(test_set_l, 
+                                    min_wl=wl_list.min(), 
+                                    max_wl=wl_list.max(), n=wl_list.shape[0], id_spetr='id')
+
+        test_set = test_set_l.pivot(index=['id', 'polymer', 'label'], 
+                                    columns='wavelength', 
+                                    values='intensity').reset_index()
+    return calibration_set, test_set
