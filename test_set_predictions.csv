@@ -1,0 +1,39 @@
+,id,prection_set,output
+0,C10. Grey Fiber.CSV,['Cotton'],Cotton
+1,C7. Blue Fiber.CSV,['Cotton'],Cotton
+2,C8. Pink Fiber Bundle.CSV,['Cotton'],Cotton
+3,EVA 3. Grey Foam.CSV,"['Acrylonitrile Butadiene Styrene', 'Cotton', 'Polyethylene', 'Polyethylene Vinyl Acetate', 'Polyvinyl Chloride', 'Rubber']",--manual check!--
+4,PA 1. Green Film.CSV,"['Polyamide', 'Polystyrene']",--manual check!--
+5,PA 4. Orange Fiber.CSV,['Polyamide'],Polyamide
+6,PA 5. Blue Fragment.CSV,['Polyamide'],Polyamide
+7,PE 13. White Fragment.CSV,"['Polyethylene', 'Polyethylene Vinyl Acetate']",--manual check!--
+8,PE 14. Green Fragment.CSV,['Polyethylene'],Polyethylene
+9,PE 2. White Pellet.CSV,['Polyethylene'],Polyethylene
+10,PE 20. Yellow Fragment.CSV,['Polyethylene'],Polyethylene
+11,PE 35. Black Fragment.CSV,['Polyethylene'],Polyethylene
+12,PE 44. Red pellet.CSV,['Polyethylene'],Polyethylene
+13,PE 48. Green Sphere.CSV,['Polyethylene'],Polyethylene
+14,PE 7. Grey Pellet.CSV,"['Polyethylene', 'Polyethylene Vinyl Acetate']",--manual check!--
+15,PE 9. Clear Fragment.CSV,"['Polyethylene', 'Polyethylene Vinyl Acetate']",--manual check!--
+16,PET 1. White Fragment.CSV,['Polyethylene Terephthalate'],Polyethylene Terephthalate
+17,PET 5. Blue Fragment.CSV,['Polyethylene Terephthalate'],Polyethylene Terephthalate
+18,PP 10. Yellow Fragment.CSV,['Polypropylene'],Polypropylene
+19,PP 18. Grey Fragment.CSV,['Polypropylene'],Polypropylene
+20,PP 23. Yellow Fragment.CSV,"['Polypropylene', 'Rubber']",--manual check!--
+21,PP 25. Orange Fragment.CSV,['Polypropylene'],Polypropylene
+22,PP 26. Yellow Fiber.CSV,['Polypropylene'],Polypropylene
+23,PP 29. Green Fragment.CSV,['Polypropylene'],Polypropylene
+24,PP 30. Clear Fragment.CSV,"['Cotton', 'Polyamide', 'Polyethylene Terephthalate', 'Polyethylene Vinyl Acetate', 'Polypropylene', 'Polystyrene', 'Polyurethane', 'Polyvinyl Chloride', 'Rubber']",--manual check!--
+25,PP 36. Purple Film.CSV,['Polypropylene'],Polypropylene
+26,PP 49. Black Fragment.CSV,['Polypropylene'],Polypropylene
+27,PP 51. White Fragment.CSV,['Polypropylene'],Polypropylene
+28,PP 53. Blue Fragment.CSV,"['Acrylonitrile Butadiene Styrene', 'Cotton', 'Polystyrene', 'Polyurethane', 'Polyvinyl Chloride', 'Rubber']",--manual check!--
+29,PP 64. Blue Fiber.CSV,"['Cotton', 'Polyurethane', 'Polyvinyl Chloride', 'Rubber']",--manual check!--
+30,PP 65. Clear Fiber.CSV,['Polypropylene'],Polypropylene
+31,PP 66. Black fiber.CSV,['Polypropylene'],Polypropylene
+32,PS 8. White Foam.CSV,['Polystyrene'],Polystyrene
+33,PU 1. Orange Foam.CSV,"['Polyethylene Terephthalate', 'Polyurethane', 'Polyvinyl Chloride']",--manual check!--
+34,PU 3. Orange Foam.CSV,['Polyurethane'],Polyurethane
+35,PVC 1. Clear Fragment.CSV,"['Acrylic', 'Polyethylene Terephthalate', 'Polyurethane', 'Polyvinyl Chloride']",--manual check!--
+36,PVC 6. Clear Film.CSV,['Polyvinyl Chloride'],Polyvinyl Chloride
+37,PVC 8. Grey Fragment.CSV,['Polyvinyl Chloride'],Polyvinyl Chloride
